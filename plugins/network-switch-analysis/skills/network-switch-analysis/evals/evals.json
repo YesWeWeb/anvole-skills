@@ -1,0 +1,51 @@
+{
+  "skill_name": "network-switch-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Analyse ce switch Cisco IOS et dis-moi quels équipements sont branchés sur chaque port. Les VLANs cibles sont : VLAN 10 pour les données PC, VLAN 20 pour la voix, VLAN 99 pour le management. Voici les outputs CLI :\n\n[contenu du fichier evals/files/cisco-ios-simple.txt]",
+      "expected_output": "Rapport avec : (1) détection du vendor Cisco IOS, (2) Gi0/2 et Gi0/3 identifiés comme Phone IP avec PC derrière (2 MACs sur le port, OUI Cisco phone et Polycom), (3) anomalie signalée sur Gi0/2 car voice VLAN 20 absent alors que phone détecté, (4) Gi0/4 correct car voice VLAN 20 présent, (5) Gi0/1 identifié comme trunk/switch amont via LLDP, (6) ports Gi0/6-8 en shutdown signalés comme ports libres, (7) recommandation d'ajouter voice VLAN sur Gi0/2 et Gi0/3",
+      "files": ["evals/files/cisco-ios-simple.txt"],
+      "assertions": [
+        "Le vendor détecté est Cisco IOS",
+        "Le port Gi0/2 est identifié comme 'Phone IP + PC' (2 MACs : Cisco phone + PC)",
+        "Le port Gi0/3 est identifié comme 'Phone IP' (Polycom VVX400 via LLDP)",
+        "Une anomalie 'sans voice VLAN' est signalée pour Gi0/2",
+        "Gi0/4 est correctement identifié comme Phone IP avec voice VLAN 20 déjà configuré",
+        "Gi0/1 est identifié comme uplink/switch via LLDP",
+        "Le % de confiance est >= 85% pour les ports avec LLDP confirmé",
+        "Une recommandation d'ajouter voice VLAN 20 est présente pour Gi0/2"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Voici les outputs d'un switch Aruba AOS-CX. Analyse tous les ports et identifie les équipements. VLANs : 10=DATA, 20=VOIX, 30=INVITES, 40=IoT, 99=MGMT.\n\n[contenu du fichier evals/files/aruba-aos-cx.txt]",
+      "expected_output": "Rapport avec : (1) détection du vendor Aruba AOS-CX, (2) port 1/1/1 identifié comme Phone IP + PC (Yealink T46S via LLDP + 2 MACs), (3) port 1/1/2 identifié comme AP WiFi (Aruba AP-305 via LLDP), (4) port 1/1/3 identifié comme Phone IP + PC (Cisco phone + Poly via OUI, 2 MACs), (5) port 1/1/48 identifié comme uplink switch, (6) anomalie : port 1/1/1 en access sans voice VLAN 20, (7) port 1/1/2 correctement en trunk pour l'AP",
+      "files": ["evals/files/aruba-aos-cx.txt"],
+      "assertions": [
+        "Le vendor détecté est Aruba AOS-CX",
+        "Le port 1/1/1 est identifié comme Phone IP (Yealink) avec PC derrière",
+        "Le port 1/1/2 est identifié comme AP WiFi (Aruba AP-305)",
+        "Le port 1/1/48 est identifié comme uplink/switch amont",
+        "Une anomalie voice VLAN manquant est signalée pour le port 1/1/1",
+        "Le rapport mentionne la notation de ports 1/1/X propre à AOS-CX",
+        "Le % de confiance pour l'AP via LLDP est >= 90%"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "J'ai deux switches en cascade. Voici les outputs des deux. Analyse la topologie et dis-moi pour chaque port de chaque switch quel équipement est branché. VLANs : 10=DATA, 20=VOIX, 99=MGMT. Note en particulier les phones IP sans voice VLAN.\n\n[contenu du fichier evals/files/multi-switch-cascade.txt]",
+      "expected_output": "Rapport avec : (1) identification de 2 switches (SW-CORE et SW-ETAGE1), (2) lien inter-switch SW-CORE:Gi1/0/23 <-> SW-ETAGE1:Gi0/1 identifié via LLDP, (3) sur SW-ETAGE1 : Gi0/2 = Phone IP + PC (Cisco phone LLDP, 2 MACs sur VLAN 10 et 20), Gi0/3 = Phone IP + PC sans voice VLAN (anomalie !) , (4) recommandation voice VLAN sur Gi0/3 de SW-ETAGE1, (5) vue topologie montrant la cascade, (6) SW-CORE:Gi1/0/23 et SW-ETAGE1:Gi0/1 identifiés comme liaison inter-switch",
+      "files": ["evals/files/multi-switch-cascade.txt"],
+      "assertions": [
+        "Les deux switches SW-CORE et SW-ETAGE1 sont identifiés séparément",
+        "Le lien inter-switch est détecté (SW-CORE Gi1/0/23 vers SW-ETAGE1 Gi0/1)",
+        "SW-ETAGE1 Gi0/2 est identifié comme Phone IP + PC (voice VLAN 20 déjà configuré)",
+        "SW-ETAGE1 Gi0/3 est identifié comme Phone IP + PC avec anomalie voice VLAN manquant",
+        "Une recommandation d'ajouter voice VLAN 20 sur SW-ETAGE1 Gi0/3 est présente",
+        "Une vue topologie ou section multi-switch est présente dans le rapport",
+        "Le % de confiance des phones identifiés via LLDP est >= 88%"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "network-switch-analysis",
+  "description": "Multi-vendor network analysis, audit, and inventory across multiple switches",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

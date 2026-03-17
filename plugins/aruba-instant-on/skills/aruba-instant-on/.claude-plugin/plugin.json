@@ -1,0 +1,8 @@
+{
+  "name": "aruba-instant-on",
+  "description": "Collect data from Aruba Instant On 1930/1960 switches via web interface",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

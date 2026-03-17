@@ -1,0 +1,8 @@
+{
+  "name": "fortigate-doc",
+  "description": "Generate operational documentation (DOE) for FortiGate firewalls",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

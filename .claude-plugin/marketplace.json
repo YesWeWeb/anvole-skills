@@ -1,0 +1,64 @@
+{
+  "name": "anvole-skills",
+  "owner": {
+    "name": "Anvole ESN",
+    "email": "gregory.lauretta@anvole.com"
+  },
+  "plugins": [
+    {
+      "name": "aruba-instant-on",
+      "source": "./plugins/aruba-instant-on",
+      "description": "Collect data from Aruba Instant On 1930/1960 switches via web interface"
+    },
+    {
+      "name": "cisco-sb",
+      "source": "./plugins/cisco-sb",
+      "description": "Collect data from Cisco Small Business switches (SG300, SG500, SG350)"
+    },
+    {
+      "name": "hp-officeconnect",
+      "source": "./plugins/hp-officeconnect",
+      "description": "Collect data from HP OfficeConnect 1920S/1920 switches via web interface"
+    },
+    {
+      "name": "hp-procurve",
+      "source": "./plugins/hp-procurve",
+      "description": "Collect data from HP ProCurve and Aruba ProVision switches via SSH CLI"
+    },
+    {
+      "name": "fortigate",
+      "source": "./plugins/fortigate",
+      "description": "Collect, export, or inventory FortiGate firewall configuration"
+    },
+    {
+      "name": "fortigate-audit",
+      "source": "./plugins/fortigate-audit",
+      "description": "Audit FortiGate firewall against CIS Benchmark and ANSSI recommendations"
+    },
+    {
+      "name": "fortigate-debug",
+      "source": "./plugins/fortigate-debug",
+      "description": "Troubleshoot and debug incidents on FortiGate firewalls"
+    },
+    {
+      "name": "fortigate-doc",
+      "source": "./plugins/fortigate-doc",
+      "description": "Generate operational documentation (DOE) for FortiGate firewalls"
+    },
+    {
+      "name": "network-switch-analysis",
+      "source": "./plugins/network-switch-analysis",
+      "description": "Multi-switch network analysis, audits, and inventory across vendors"
+    },
+    {
+      "name": "outlook",
+      "source": "./plugins/outlook",
+      "description": "Read, search, move, delete, draft, reply, forward emails via local Outlook COM API"
+    },
+    {
+      "name": "itop-tickets",
+      "source": "./plugins/itop-tickets",
+      "description": "Gestion des tickets et incidents iTop via le bridge n8n-anvole"
+    }
+  ]
+}

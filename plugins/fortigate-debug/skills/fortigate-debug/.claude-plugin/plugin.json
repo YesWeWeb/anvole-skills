@@ -1,0 +1,8 @@
+{
+  "name": "fortigate-debug",
+  "description": "Troubleshoot and diagnose FortiGate incidents (VPN, CPU, HA, network) via MCP",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

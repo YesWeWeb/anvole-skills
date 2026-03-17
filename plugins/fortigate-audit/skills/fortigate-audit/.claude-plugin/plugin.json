@@ -1,0 +1,8 @@
+{
+  "name": "fortigate-audit",
+  "description": "Audit FortiGate compliance against CIS Benchmark 7.4.x and ANSSI recommendations",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

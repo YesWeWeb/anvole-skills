@@ -1,0 +1,159 @@
+===== SWITCH 1 : SW-CORE =====
+Cisco IOS Software, Catalyst C3750X, Version 15.2(7)E3
+SW-CORE#
+
+SW-CORE#show mac address-table
+          Mac Address Table
+-------------------------------------------
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+  10    d4be.d9aa.0011    DYNAMIC     Gi1/0/1
+  10    001c.c4dd.eeff    DYNAMIC     Gi1/0/2
+  99    0050.56a1.0001    STATIC      Vl99
+ All    0000.0000.0000    STATIC      CPU
+Total Mac Addresses for this criterion: 3
+
+SW-CORE#show running-config
+hostname SW-CORE
+!
+interface GigabitEthernet1/0/1
+ description PC-Admin
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/2
+ description PC-Serveur
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/23
+ description Link-to-SW-ETAGE1
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,99
+!
+interface GigabitEthernet1/0/24
+ description Uplink-Routeur
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,99
+!
+
+SW-CORE#show lldp neighbors detail
+------------------------------------------------
+Local Intf: Gi1/0/23
+Chassis id: aabb.cc11.2233
+Port id: Gi0/1
+Port Description: Uplink-vers-SW-CORE
+System Name: SW-ETAGE1
+
+System Description:
+Cisco IOS Software, Catalyst C2960S, Version 12.2(58)SE2
+
+System Capabilities: B
+Enabled Capabilities: B
+
+Management Addresses:
+    IP: 10.0.99.2
+------------------------------------------------
+
+
+===== SWITCH 2 : SW-ETAGE1 =====
+Cisco IOS Software, Version 12.2(58)SE2, RELEASE SOFTWARE (fc1)
+SW-ETAGE1#
+
+SW-ETAGE1#show mac address-table
+          Mac Address Table
+-------------------------------------------
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+   1    aabb.cc11.2233    DYNAMIC     Gi0/1
+  10    0026.9941.1111    DYNAMIC     Gi0/2
+  10    e4a7.c500.aabb    DYNAMIC     Gi0/2
+  10    0026.9941.2222    DYNAMIC     Gi0/3
+  10    f8b1.56cc.0011    DYNAMIC     Gi0/3
+  10    001c.c4aa.bbcc    DYNAMIC     Gi0/4
+  20    0026.9941.1111    DYNAMIC     Gi0/2
+  20    0026.9941.2222    DYNAMIC     Gi0/3
+Total Mac Addresses for this criterion: 7
+
+SW-ETAGE1#show running-config
+hostname SW-ETAGE1
+!
+interface GigabitEthernet0/1
+ description Uplink-vers-SW-CORE
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,99
+!
+interface GigabitEthernet0/2
+ description Phone-Leroy
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ spanning-tree portfast
+!
+interface GigabitEthernet0/3
+ description Phone-Bernard
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/4
+ description PC-Comptabilite
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/5
+ shutdown
+!
+
+SW-ETAGE1#show lldp neighbors detail
+------------------------------------------------
+Local Intf: Gi0/1
+Chassis id: d4be.d900.0001
+Port id: Gi1/0/23
+Port Description: Link-to-SW-ETAGE1
+System Name: SW-CORE
+
+System Description:
+Cisco IOS Software, Catalyst C3750X, Version 15.2(7)E3
+
+System Capabilities: B, R
+Enabled Capabilities: B
+
+Management Addresses:
+    IP: 10.0.99.1
+------------------------------------------------
+Local Intf: Gi0/2
+Chassis id: 0026.9941.1111
+Port id: Port 1
+Port Description: SW Port
+System Name: SEP002699411111
+
+System Description:
+Cisco IP Phone CP-8861, V14-1-1SR1-1
+
+System Capabilities: B, T
+Enabled Capabilities: B, T
+
+Management Addresses:
+    IP: 10.0.20.51
+
+Vlan ID: 20
+------------------------------------------------
+Local Intf: Gi0/3
+Chassis id: 0026.9941.2222
+Port id: Port 1
+Port Description: SW Port
+System Name: SEP002699412222
+
+System Description:
+Cisco IP Phone CP-7942G, V9-4-2SR3-1
+
+System Capabilities: B, T
+Enabled Capabilities: B, T
+
+Management Addresses:
+    IP: 10.0.20.52
+------------------------------------------------

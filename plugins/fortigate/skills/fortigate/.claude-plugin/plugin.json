@@ -1,0 +1,8 @@
+{
+  "name": "fortigate",
+  "description": "Collect, export, and inventory FortiGate firewall configurations via MCP",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

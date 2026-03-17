@@ -1,0 +1,8 @@
+{
+  "name": "cisco-sb",
+  "description": "Collect data from Cisco Small Business switches (SG/CBS series)",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

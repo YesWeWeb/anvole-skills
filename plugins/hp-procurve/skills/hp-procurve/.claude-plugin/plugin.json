@@ -1,0 +1,8 @@
+{
+  "name": "hp-procurve",
+  "description": "Collect data from HP ProCurve / Aruba ProVision switches via SSH CLI",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

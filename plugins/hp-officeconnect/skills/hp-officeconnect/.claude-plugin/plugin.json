@@ -1,0 +1,8 @@
+{
+  "name": "hp-officeconnect",
+  "description": "Collect data from HP OfficeConnect 1920S switches via web interface",
+  "version": "1.0.0",
+  "author": {
+    "name": "ANVOLE / YesWeWeb"
+  }
+}

@@ -1,0 +1,114 @@
+ArubaOS-CX (c) Copyright 2017-2023 Hewlett Packard Enterprise Development LP
+SW-BUREAUX# show version
+ArubaOS-CX GL.10.10.0010
+Platform: 6300M
+Serial Number: CN12345678
+
+SW-BUREAUX# show mac-address-table
+MAC age-time    : 300 seconds
+Number of MAC addresses : 7
+
+MAC Address          VLAN    Type    Port
+-----------------  ------  ------  -----------
+80:5e:c0:12:34:56      10  dynamic  1/1/1
+a0:b1:c2:d3:e4:f5      10  dynamic  1/1/1
+00:0b:86:11:22:33      10  dynamic  1/1/2
+00:26:99:aa:bb:cc      10  dynamic  1/1/3
+f8:b1:56:dd:ee:ff      10  dynamic  1/1/3
+18:03:73:00:11:22      10  dynamic  1/1/4
+b0:83:fe:33:44:55      10  dynamic  1/1/5
+80:5e:c0:12:34:56      20  dynamic  1/1/1
+
+SW-BUREAUX# show running-config
+hostname SW-BUREAUX
+!
+interface 1/1/1
+    description Yealink-Secretariat
+    vlan access 10
+    spanning-tree port-type admin-edge
+    no shutdown
+!
+interface 1/1/2
+    description AP-WiFi-Ubiquiti
+    vlan trunk native 10
+    vlan trunk allowed 10,30,40
+    spanning-tree port-type admin-edge
+    no shutdown
+!
+interface 1/1/3
+    description Phone-Directeur
+    vlan access 10
+    spanning-tree port-type admin-edge
+    no shutdown
+!
+interface 1/1/4
+    description PC-Comptabilite
+    vlan access 10
+    spanning-tree port-type admin-edge
+    no shutdown
+!
+interface 1/1/5
+    description PC-Direction
+    vlan access 10
+    spanning-tree port-type admin-edge
+    no shutdown
+!
+interface 1/1/48
+    description Uplink-Core
+    vlan trunk native 1
+    vlan trunk allowed 1,10,20,30,40,99
+    no shutdown
+!
+
+SW-BUREAUX# show lldp neighbor-info detail
+
+Port        : 1/1/1
+Neighbor    : 80:5e:c0:12:34:56
+Chassis-id  : 80:5e:c0:12:34:56
+Port-id     : Port 1
+TTL         : 120
+System-name : Yealink-T46S
+System-descr: Yealink T46S 66.86.0.20
+
+System capabilities
+  Supported  : Bridge, Telephone
+  Enabled    : Bridge, Telephone
+
+Management addresses
+  IPV4        : 10.0.20.50
+
+---
+
+Port        : 1/1/2
+Neighbor    : 00:0b:86:11:22:33
+Chassis-id  : 00:0b:86:11:22:33
+Port-id     : 1/1/2
+TTL         : 100
+System-name : AP-BUREAUX-1
+System-descr: Aruba AP-305 8.9.0.0
+
+System capabilities
+  Supported  : Bridge, WLAN Access Point
+  Enabled    : Bridge, WLAN Access Point
+
+Management addresses
+  IPV4        : 10.0.10.10
+
+---
+
+Port        : 1/1/48
+Neighbor    : a4:c3:f0:aa:bb:cc
+Chassis-id  : a4:c3:f0:aa:bb:cc
+Port-id     : 1/1/1
+TTL         : 110
+System-name : SW-CORE
+System-descr: ArubaOS-CX 8360 GL.10.09.0010
+
+System capabilities
+  Supported  : Bridge, Router
+  Enabled    : Bridge
+
+Management addresses
+  IPV4        : 10.0.99.1
+
+---

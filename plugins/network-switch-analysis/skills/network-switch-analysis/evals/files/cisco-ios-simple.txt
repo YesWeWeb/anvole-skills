@@ -1,0 +1,123 @@
+Cisco IOS Software, Version 15.2(7)E3, RELEASE SOFTWARE (fc4)
+Copyright (c) 1986-2021 by Cisco Systems, Inc.
+
+SW-ETAGE1#show mac address-table
+          Mac Address Table
+-------------------------------------------
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+   1    1c6a.7a00.1234    DYNAMIC     Gi0/1
+  10    d4be.d9aa.0011    DYNAMIC     Gi0/1
+  10    0026.9941.abcd    DYNAMIC     Gi0/2
+  10    f8b1.56aa.0011    DYNAMIC     Gi0/2
+  10    0004.f2bb.1122    DYNAMIC     Gi0/3
+  10    8c1a.bf99.aabb    DYNAMIC     Gi0/4
+  10    001c.c4dd.eeff    DYNAMIC     Gi0/5
+  20    0026.9941.abcd    DYNAMIC     Gi0/2
+  20    0004.f2bb.1122    DYNAMIC     Gi0/3
+  99    0050.56a1.0001    STATIC      Vl99
+Total Mac Addresses for this criterion: 9
+
+SW-ETAGE1#show interfaces status
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi0/1     Uplink-SW-CORE     connected    trunk      a-full  a-1G  10/100/1000BaseTX
+Gi0/2     Phone-Dupont       connected    10         a-full  a-100 10/100/1000BaseTX
+Gi0/3     Phone-Martin       connected    10         a-full  a-100 10/100/1000BaseTX
+Gi0/4     Phone-Robert       connected    10         a-full  a-100 10/100/1000BaseTX
+Gi0/5     PC-RH              connected    10         a-full  a-100 10/100/1000BaseTX
+Gi0/6                        notconnect   1          auto    auto  10/100/1000BaseTX
+Gi0/7                        notconnect   1          auto    auto  10/100/1000BaseTX
+Gi0/8                        notconnect   1          auto    auto  10/100/1000BaseTX
+
+SW-ETAGE1#show running-config
+hostname SW-ETAGE1
+!
+interface GigabitEthernet0/1
+ description Uplink-SW-CORE
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,99
+!
+interface GigabitEthernet0/2
+ description Phone-Dupont
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/3
+ description Phone-Martin
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/4
+ description Phone-Robert
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ spanning-tree portfast
+!
+interface GigabitEthernet0/5
+ description PC-RH
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/6
+ shutdown
+!
+interface GigabitEthernet0/7
+ shutdown
+!
+interface GigabitEthernet0/8
+ shutdown
+!
+
+SW-ETAGE1#show lldp neighbors detail
+------------------------------------------------
+Local Intf: Gi0/1
+Chassis id: a0b1.c2d3.e4f5
+Port id: Gi1/0/24
+Port Description: Link to SW-ETAGE1
+System Name: SW-CORE
+
+System Description:
+Cisco IOS Software, Catalyst C3750X, Version 15.2
+
+System Capabilities: B, R
+Enabled Capabilities: B
+
+Management Addresses:
+    IP: 10.0.99.1
+------------------------------------------------
+Local Intf: Gi0/2
+Chassis id: 0026.9941.abcd
+Port id: Port 1
+Port Description: SW Port
+System Name: SEP002699 41ABCD
+
+System Description:
+Cisco IP Phone CP-8841, V14-3-1SR3-1
+
+System Capabilities: B, T
+Enabled Capabilities: B, T
+
+Management Addresses:
+    IP: 10.0.20.45
+
+Vlan ID: 20
+------------------------------------------------
+Local Intf: Gi0/3
+Chassis id: 0004.f2bb.1122
+Port id: Port 1
+Port Description: SW Port
+System Name: Polycom-VVX400
+
+System Description:
+Polycom VVX 400 9.0.3.189
+
+System Capabilities: T
+Enabled Capabilities: T
+
+Management Addresses:
+    IP: 10.0.20.46
+------------------------------------------------
