@@ -15,12 +15,15 @@
   "workflowId": "HWjhsTJpR6VikRur",
   "triggerType": "webhook",
   "httpMethod": "POST",
+  "headers": {"X-API-Key": "<ITOP_BRIDGE_API_KEY>"},
   "data": {
     "action": "get_tickets",
     "oql_filter": "WHERE priority = 1"
   }
 }
 ```
+
+⚠️ Le header `X-API-Key` est obligatoire (401 sans). La clé vient du contexte de session.
 
 ## Champs retournés par type d'objet
 
@@ -223,9 +226,18 @@ Crée une nouvelle UserRequest.
 ### create_incident
 Identique à create_ticket mais crée un Incident.
 
+### add_timesheet
+Pointe du temps sur un ticket sans changer son statut.
+- `ticket_id` (int, requis) : ID numérique iTop
+- `time_spent` (int, requis) : durée en **secondes** (ex: 1800 = 30 min)
+- `agent_name` (string) : agent ayant travaillé (défaut: "Lauretta")
+- `comment` (string) : description du travail effectué
+- `class` (string, défaut "UserRequest") : "UserRequest" ou "Incident"
+
 ### get_ticket_stats
-Statistiques agrégées : volumes par statut, par priorité, par organisation,
-SLA compliance. Aucun paramètre requis.
+Statistiques agrégées : volumes par statut, par priorité, par organisation, SLA compliance.
+- `org_name` (string, optionnel) : filtrer les stats pour un client spécifique
+- `days` (int, optionnel) : limiter la période (ex: 30 = dernier mois)
 
 ## Workflows n8n associés (pour référence)
 

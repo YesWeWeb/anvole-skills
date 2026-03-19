@@ -3,16 +3,13 @@ name: itop-tickets
 description: >
   Gestion des tickets et incidents iTop via le bridge n8n-anvole. Consulter, rechercher,
   commenter, assigner, résoudre, pointer du temps et créer des tickets/incidents dans l'ITSM
-  Anvole (itsm.cloud.anvole.com). Utilise ce skill dès que l'utilisateur mentionne : ticket,
-  incident, demande utilisateur, iTop, ITSM, SLA, support client, intervention, R-XXXX, I-XXXX,
-  "mes tickets", "tickets ouverts", "tickets en retard", "relancer un ticket", "créer un ticket",
-  "pointer du temps", "time spent", "résoudre le ticket", "assigner", "commenter un ticket",
-  "tickets du client X", "qu'est-ce qu'on a en cours", "combien de tickets", "suivi support",
-  ou toute demande liée à la gestion de tickets de support IT dans le contexte MSP Anvole.
-  Se déclenche aussi quand le Morning Briefing a besoin du volume de tickets ou des SLA,
-  ou quand Greg parle d'un client ayant un problème technique à traiter. Même si la demande
-  semble simple ("montre-moi les tickets"), utilise ce skill car il connaît la bonne route
-  vers iTop via n8n et évite de chercher un autre chemin.
+  Anvole (itsm.cloud.anvole.com). Triggers : ticket, incident, iTop, ITSM, SLA, support,
+  R-XXXX, I-XXXX, "mes tickets", "tickets ouverts/en retard", "créer un ticket",
+  "pointer du temps", "résoudre le ticket", "assigner", "tickets du client X",
+  "combien de tickets", "suivi support", ou toute demande liée aux tickets IT Anvole.
+  Se déclenche aussi pour le Morning Briefing (volume tickets/SLA) et quand Greg parle
+  d'un problème client. Utilise ce skill même pour les demandes simples — il connaît
+  la bonne route vers iTop via n8n.
 ---
 
 # iTop Tickets — Skill Anvole
@@ -36,12 +33,17 @@ mcp__n8n-anvole__n8n_test_workflow({
   workflowId: "HWjhsTJpR6VikRur",
   triggerType: "webhook",
   httpMethod: "POST",
+  headers: {"X-API-Key": "<ITOP_BRIDGE_API_KEY>"},
   data: {
     action: "<action_name>",
     ...params
   }
 })
 ```
+
+⚠️ Le header `X-API-Key` est **obligatoire** — sans lui le bridge retourne 401.
+La clé est injectée par le contexte de session (CLAUDE.md ou variables d'environnement).
+Ne jamais la hardcoder dans ce skill.
 
 Le bridge répond avec un objet JSON contenant `success`, `action`, et les données
 (tickets, incidents, confirmation d'écriture, stats...).
@@ -90,12 +92,13 @@ Le `ticket_id` reste le param pour les détails d'un incident.
 | `update_status` | Changer le statut via stimulus | `ticket_id`, `stimulus` | `class`, `fields` |
 | `create_ticket` | Créer une UserRequest | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
 | `create_incident` | Créer un Incident | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
+| `add_timesheet` | Pointer du temps sur un ticket | `ticket_id`, `time_spent` (en secondes) | `agent_name`, `comment`, `class` |
 
 ### Statistiques
 
-| Action | Description | Params |
-|---|---|---|
-| `get_ticket_stats` | Volumes, répartition, SLA | — |
+| Action | Description | Params requis | Params optionnels |
+|---|---|---|---|
+| `get_ticket_stats` | Volumes, répartition, SLA | — | `org_name` (filtrer par client), `days` (période en jours) |
 
 ## Workflow type par cas d'usage
 
@@ -123,8 +126,8 @@ Le `ticket_id` reste le param pour les détails d'un incident.
 4. Confirmer
 
 ### "Pointe 30 minutes sur R-001234"
-1. Appeler `resolve_ticket` avec `time_spent: 30` (le bridge gère le time tracking)
-   OU utiliser `add_comment` pour juste noter le temps sans résoudre
+1. Appeler `add_timesheet` avec `ticket_id` et `time_spent: 1800` (en secondes)
+   → Pointe le temps sans résoudre ni changer le statut du ticket
 
 ## Règles importantes
 
