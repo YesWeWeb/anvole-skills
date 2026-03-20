@@ -54,6 +54,11 @@
       "name": "outlook",
       "source": "./plugins/outlook",
       "description": "Read, search, move, delete, draft, reply, forward emails via local Outlook COM API"
+    },
+    {
+      "name": "itop-tickets",
+      "source": "./plugins/itop-tickets",
+      "description": "Gestion des tickets et incidents iTop via le bridge n8n-anvole"
     }
   ]
 }
