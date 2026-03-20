@@ -1,29 +1,19 @@
-# Claude Bridge — iTop Tickets v2 — Référence API
+# iTop MCP Server — Référence API
 
-## Informations de connexion
+## Architecture
 
-- **Workflow ID** : `HWjhsTJpR6VikRur`
-- **Instance n8n** : n8n-anvole (MCP `mcp__n8n-anvole__n8n_test_workflow`)
-- **Trigger type** : webhook (POST)
-- **iTop backend** : https://itsm.cloud.anvole.com/itop/webservices/rest.php
-- **API version** : 1.3
-
-## Appel type
-
-```json
-{
-  "workflowId": "HWjhsTJpR6VikRur",
-  "triggerType": "webhook",
-  "httpMethod": "POST",
-  "headers": {"X-API-Key": "<ITOP_BRIDGE_API_KEY>"},
-  "data": {
-    "action": "get_tickets",
-    "oql_filter": "WHERE priority = 1"
-  }
-}
+```
+Claude/Cowork → MCP itop (stdio) → HTTP POST → n8n bridge (HWjhsTJpR6VikRur) → iTop REST API 1.3
 ```
 
-⚠️ Le header `X-API-Key` est obligatoire (401 sans). La clé vient du contexte de session.
+- **MCP** : `mcp__itop__` (serveur local stdio)
+- **Bridge n8n** : workflow `HWjhsTJpR6VikRur` sur rapport.cloud.anvole.com
+- **iTop backend** : https://itsm.cloud.anvole.com/itop/webservices/rest.php
+- **API version iTop** : 1.3
+- **Bridge version** : 2.1
+
+L'authentification est geree par les variables d'environnement du MCP (ITOP_BRIDGE_API_KEY).
+Aucune cle a manipuler dans le skill.
 
 ## Champs retournés par type d'objet
 
@@ -156,15 +146,19 @@ Retourne tous les tickets non closed/resolved par défaut.
 
 ### get_ticket_details
 Retourne le détail complet d'un ticket unique.
-- `ticket_id` (int, requis) : ID numérique iTop
+- `ticket_id` (int) : ID numérique iTop
+- `ref` (string) : Ref iTop (ex: R-260318-034592) — alternative au ticket_id
+- L'un des deux est requis. Si `ref` est fourni, l'ID est résolu automatiquement.
 
 ### get_my_tickets
 Retourne les tickets assignés à un agent spécifique.
 - `agent_name` (string, défaut "Lauretta") : nom partiel de l'agent (LIKE match)
 
 ### search_tickets
-Recherche dans titre ET description.
-- `keyword` (string, requis) : terme de recherche
+Recherche dans titre, description ET ref. Si le keyword matche le pattern
+R-XXXXXX-XXXXXX ou I-XXXXXX-XXXXXX, fait automatiquement un WHERE ref = '...'
+au lieu d'un LIKE. Retourne les champs détaillés (logs inclus).
+- `keyword` (string, requis) : terme de recherche ou ref exacte
 
 ### get_tickets_by_org
 Filtre par nom d'organisation (LIKE match).

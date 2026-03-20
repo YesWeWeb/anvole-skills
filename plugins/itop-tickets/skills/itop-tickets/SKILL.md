@@ -1,153 +1,156 @@
 ---
 name: itop-tickets
 description: >
-  Gestion des tickets et incidents iTop via le bridge n8n-anvole. Consulter, rechercher,
-  commenter, assigner, résoudre, pointer du temps et créer des tickets/incidents dans l'ITSM
-  Anvole (itsm.cloud.anvole.com). Triggers : ticket, incident, iTop, ITSM, SLA, support,
-  R-XXXX, I-XXXX, "mes tickets", "tickets ouverts/en retard", "créer un ticket",
+  Gestion des tickets et incidents iTop via le MCP itop (serveur MCP local stdio).
+  Consulter, rechercher, commenter, assigner, résoudre, pointer du temps et créer
+  des tickets/incidents dans l'ITSM Anvole (itsm.cloud.anvole.com).
+  Triggers : ticket, incident, iTop, ITSM, SLA, support, R-XXXX, I-XXXX,
+  "mes tickets", "tickets ouverts/en retard", "créer un ticket",
   "pointer du temps", "résoudre le ticket", "assigner", "tickets du client X",
   "combien de tickets", "suivi support", ou toute demande liée aux tickets IT Anvole.
-  Se déclenche aussi pour le Morning Briefing (volume tickets/SLA) et quand Greg parle
-  d'un problème client. Utilise ce skill même pour les demandes simples — il connaît
-  la bonne route vers iTop via n8n.
+  Se déclenche aussi pour le Morning Briefing (volume tickets/SLA) et quand Greg
+  parle d'un problème client.
 ---
 
 # iTop Tickets — Skill Anvole
 
 ## Contexte
 
-iTop est l'ITSM d'Anvole (itsm.cloud.anvole.com). L'accès se fait exclusivement via le
-**Claude Bridge — iTop Tickets v2**, un workflow n8n exposé en webhook sur l'instance
-n8n-anvole. Ce bridge gère l'authentification, la construction des requêtes OQL, et le
-parsing des réponses iTop.
+iTop est l'ITSM d'Anvole (itsm.cloud.anvole.com). L'accès se fait via le **MCP itop**
+(`mcp__itop__`), un serveur MCP local (stdio) qui appelle le bridge n8n `claude-itop`.
+L'authentification est gérée par les variables d'environnement du MCP — aucune clé
+API à manipuler dans ce skill.
 
-Le bridge n'est PAS appelé via HTTP direct — il est déclenché via l'outil MCP
-`mcp__n8n-anvole__n8n_test_workflow` avec le workflowId du bridge.
+## Comment appeler iTop
 
-## Comment appeler le bridge
-
-Toutes les opérations iTop passent par un seul appel :
+Utiliser directement les outils MCP `mcp__itop__*`. Exemples :
 
 ```
-mcp__n8n-anvole__n8n_test_workflow({
-  workflowId: "HWjhsTJpR6VikRur",
-  triggerType: "webhook",
-  httpMethod: "POST",
-  headers: {"X-API-Key": "<ITOP_BRIDGE_API_KEY>"},
-  data: {
-    action: "<action_name>",
-    ...params
-  }
-})
+mcp__itop__itop_get_my_tickets({ agent_name: "Lauretta" })
+mcp__itop__itop_search_incidents({ keyword: "I-260318-034592" })
+mcp__itop__itop_get_incident_details({ ref: "I-260318-034592" })
 ```
 
-⚠️ Le header `X-API-Key` est **obligatoire** — sans lui le bridge retourne 401.
-La clé est injectée par le contexte de session (CLAUDE.md ou variables d'environnement).
-Ne jamais la hardcoder dans ce skill.
+## Outils disponibles (28)
 
-Le bridge répond avec un objet JSON contenant `success`, `action`, et les données
-(tickets, incidents, confirmation d'écriture, stats...).
+### Lecture — Tickets (UserRequest) — 8 outils
 
-## Actions disponibles
-
-### Lecture — Tickets (UserRequest)
-
-| Action | Description | Params requis | Params optionnels |
+| Outil MCP | Description | Params requis | Params optionnels |
 |---|---|---|---|
-| `get_tickets` | Tickets ouverts (non closed/resolved) | — | `oql_filter`, `include_details` |
-| `get_ticket_details` | Détail complet d'un ticket | `ticket_id` | — |
-| `get_my_tickets` | Tickets assignés à un agent | — | `agent_name` (défaut: "Lauretta") |
-| `search_tickets` | Recherche par mot-clé (titre + description) | `keyword` | — |
-| `get_tickets_by_org` | Tickets d'un client | `org_name` | — |
-| `get_tickets_by_status` | Tickets par statut | `status` | — |
-| `get_tickets_by_priority` | Tickets par priorité | `priority` | — |
-| `get_overdue_tickets` | Tickets en dépassement SLA | — | — |
+| `itop_get_tickets` | Tickets ouverts (non closed/resolved) | — | `oql_filter`, `include_details` |
+| `itop_get_ticket_details` | Détail complet d'un ticket | `ticket_id` OU `ref` | — |
+| `itop_get_my_tickets` | Tickets assignés à un agent | — | `agent_name` (défaut: "Lauretta") |
+| `itop_search_tickets` | Recherche par mot-clé (titre, description, ref) | `keyword` | — |
+| `itop_get_tickets_by_org` | Tickets d'un client | `org_name` | — |
+| `itop_get_tickets_by_status` | Tickets par statut | `status` | — |
+| `itop_get_tickets_by_priority` | Tickets par priorité | `priority` | — |
+| `itop_get_overdue_tickets` | Tickets en dépassement SLA | — | — |
 
-### Lecture — Incidents
+### Lecture — Incidents — 8 outils
 
-Mêmes patterns que les tickets, avec les actions :
-`get_incidents`, `get_incident_details`, `get_my_incidents`, `search_incidents`,
-`get_incidents_by_org`, `get_incidents_by_status`, `get_incidents_by_priority`,
-`get_overdue_incidents`
+| Outil MCP | Description | Params requis | Params optionnels |
+|---|---|---|---|
+| `itop_get_incidents` | Incidents ouverts | — | `oql_filter`, `include_details` |
+| `itop_get_incident_details` | Détail complet d'un incident | `ticket_id` OU `ref` | — |
+| `itop_get_my_incidents` | Incidents assignés à un agent | — | `agent_name` (défaut: "Lauretta") |
+| `itop_search_incidents` | Recherche par mot-clé (titre, description, ref) | `keyword` | — |
+| `itop_get_incidents_by_org` | Incidents d'un client | `org_name` | — |
+| `itop_get_incidents_by_status` | Incidents par statut | `status` | — |
+| `itop_get_incidents_by_priority` | Incidents par priorité | `priority` | — |
+| `itop_get_overdue_incidents` | Incidents en dépassement SLA | — | — |
 
-Les params sont identiques — remplace juste "ticket" par "incident" dans le nom d'action.
-Le `ticket_id` reste le param pour les détails d'un incident.
+### Lecture — Référentiel — 4 outils
 
-### Lecture — Référentiel
-
-| Action | Description | Params |
+| Outil MCP | Description | Params |
 |---|---|---|
-| `get_organizations` | Liste des organisations clients | — |
-| `get_contacts` | Contacts (+ audit qualité) | `org_name?` |
-| `get_services` | Services + sous-catégories | — |
-| `get_teams` | Équipes support | — |
+| `itop_get_organizations` | Organisations clients | — |
+| `itop_get_contacts` | Contacts (+ filtre org) | `org_name?` |
+| `itop_get_services` | Catalogue de services + sous-catégories | — |
+| `itop_get_teams` | Équipes support | — |
 
-### Écriture
+### Écriture — 7 outils
 
-| Action | Description | Params requis | Params optionnels |
+| Outil MCP | Description | Params requis | Params optionnels |
 |---|---|---|---|
-| `add_comment` | Ajouter un commentaire à un ticket | `ticket_id`, `comment` | `private` (bool), `class` |
-| `assign_ticket` | Assigner un ticket à un agent | `ticket_id`, `agent_name` | `class` |
-| `resolve_ticket` | Résoudre un ticket | `ticket_id`, `solution` | `resolution_code`, `time_spent`, `agent_name`, `class` |
-| `update_status` | Changer le statut via stimulus | `ticket_id`, `stimulus` | `class`, `fields` |
-| `create_ticket` | Créer une UserRequest | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
-| `create_incident` | Créer un Incident | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
-| `add_timesheet` | Pointer du temps sur un ticket | `ticket_id`, `time_spent` (en secondes) | `agent_name`, `comment`, `class` |
+| `itop_add_comment` | Commentaire public/privé | `ticket_id`, `comment` | `private` (bool), `class` |
+| `itop_assign_ticket` | Assigner à un agent | `ticket_id`, `agent_name` | `class` |
+| `itop_resolve_ticket` | Résoudre (+ solution + time_spent) | `ticket_id`, `solution` | `resolution_code`, `time_spent`, `agent_name`, `class` |
+| `itop_update_status` | Transition par stimulus | `ticket_id`, `stimulus` | `class`, `fields` |
+| `itop_create_ticket` | Créer un UserRequest | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
+| `itop_create_incident` | Créer un Incident | `title`, `org_name`, `description` | `caller`, `priority`, `service`, `subcategory` |
+| `itop_add_timesheet` | Pointer du temps (en secondes) | `ticket_id`, `time_spent` | `agent_name`, `comment`, `class` |
 
-### Statistiques
+### Statistiques — 1 outil
 
-| Action | Description | Params requis | Params optionnels |
-|---|---|---|---|
-| `get_ticket_stats` | Volumes, répartition, SLA | — | `org_name` (filtrer par client), `days` (période en jours) |
+| Outil MCP | Description | Params optionnels |
+|---|---|---|
+| `itop_get_ticket_stats` | Volumes, SLA, distribution | `org_name`, `days` |
 
-## Workflow type par cas d'usage
+## Règles CRITIQUES
+
+### "Mes tickets" = TOUJOURS tickets + incidents
+
+Quand Greg dit "mes tickets", "montre-moi mes tickets", "quoi de neuf côté support",
+ou toute demande qui implique de voir ses tâches iTop, il faut **TOUJOURS** lancer
+les deux appels en parallèle :
+- `itop_get_my_tickets` (UserRequests)
+- `itop_get_my_incidents` (Incidents)
+
+Puis fusionner les résultats dans une vue unifiée. Ne jamais oublier les incidents.
+Même logique pour "tickets du client X" → `get_tickets_by_org` + `get_incidents_by_org`.
+
+### Recherche par ref
+
+- Si l'utilisateur donne une ref type `R-XXXXXX-XXXXXX` ou `I-XXXXXX-XXXXXX`, utiliser
+  directement `itop_search_tickets` ou `itop_search_incidents` — le bridge détecte le
+  pattern et fait un `WHERE ref = '...'` automatiquement.
+- Pour les détails, utiliser `itop_get_ticket_details({ ref: "R-..." })` ou
+  `itop_get_incident_details({ ref: "I-..." })` — pas besoin de résoudre l'ID d'abord.
+- Préfixe `R-` = UserRequest, préfixe `I-` = Incident.
+
+### Confirmation obligatoire
+
+Toujours demander confirmation avant une action d'écriture (create, resolve, assign,
+update_status, add_comment, add_timesheet).
+
+### Valeurs par défaut
+
+- **agent_name** : "Lauretta" (Greg) sauf indication contraire
+- **class** : "UserRequest" pour les tickets, "Incident" pour les incidents
+- **response_format** : "markdown" pour l'affichage, "json" si besoin de post-traitement
+
+## Workflows par cas d'usage
 
 ### "Montre-moi mes tickets"
-1. Appeler `get_my_tickets` (agent_name optionnel, défaut = Greg)
-2. Présenter en tableau : ref, titre, client, priorité, statut, date
+1. Appeler EN PARALLÈLE `itop_get_my_tickets` + `itop_get_my_incidents`
+2. Fusionner les résultats
+3. Présenter en tableau unifié : ref, titre, client, priorité, statut, date
 
 ### "Tickets du client SYVADE"
-1. Appeler `get_tickets_by_org` avec `org_name: "SYVADE"`
-2. Présenter triés par priorité
+1. Appeler EN PARALLÈLE `itop_get_tickets_by_org` + `itop_get_incidents_by_org` avec `org_name: "SYVADE"`
+2. Fusionner, trier par priorité
 
-### "Combien de tickets en cours ?"
-1. Appeler `get_ticket_stats`
-2. Résumer les chiffres clés
-
-### "Crée un ticket pour Pharmacie Montebello"
-1. Demander les infos manquantes (titre, description, priorité)
-2. Appeler `create_ticket` avec les params
-3. Confirmer la création avec la ref retournée
+### "C'est quoi le ticket I-260318-034592 ?"
+1. Préfixe `I-` → c'est un incident
+2. Appeler `itop_get_incident_details({ ref: "I-260318-034592" })`
+3. Présenter les détails complets (logs, solution, time_spent)
 
 ### "Résous le ticket R-001234"
-1. Appeler `get_ticket_details` avec le ticket_id pour vérifier le contexte
+1. Appeler `itop_get_ticket_details({ ref: "R-001234" })` pour vérifier le contexte
 2. Demander la solution si non fournie
-3. Appeler `resolve_ticket`
+3. Appeler `itop_resolve_ticket` avec le `ticket_id` numérique
 4. Confirmer
 
 ### "Pointe 30 minutes sur R-001234"
-1. Appeler `add_timesheet` avec `ticket_id` et `time_spent: 1800` (en secondes)
-   → Pointe le temps sans résoudre ni changer le statut du ticket
+1. Appeler `itop_add_timesheet` avec `ticket_id` et `time_spent: 1800` (en secondes)
+   → Pointe le temps sans résoudre ni changer le statut
 
-## Règles importantes
-
-- **Jamais d'appel HTTP direct** vers itsm.cloud.anvole.com — toujours passer par le bridge n8n
-- **Confirmation obligatoire** avant toute action d'écriture (create, resolve, assign, update_status)
-- **Le ticket_id** est l'ID numérique iTop, pas la ref (R-001234). Si l'utilisateur donne une ref,
-  chercher d'abord avec `search_tickets` ou `get_ticket_details` pour obtenir l'ID
-- **agent_name par défaut** : "Lauretta" (Greg) — sauf indication contraire
-- **class par défaut** : "UserRequest" pour les tickets, "Incident" pour les incidents
-- Les réponses du bridge sont déjà parsées et nettoyées — pas besoin de post-traitement
+### "Combien de tickets en cours ?"
+1. Appeler `itop_get_ticket_stats`
+2. Résumer les chiffres clés (volumes, SLA, distribution)
 
 ## Référence détaillée
 
 Pour le schéma complet des réponses, les champs disponibles par type d'objet, et les
 valeurs possibles pour les statuts/priorités/stimulus, consulter :
 → `references/bridge-api.md`
-
-## Troubleshooting
-
-Si le bridge retourne une erreur :
-- `success: false` avec un message → afficher le message d'erreur à l'utilisateur
-- Timeout → le bridge peut être surchargé, réessayer une fois
-- `available_actions` dans la réponse d'erreur → le bridge liste les actions valides
